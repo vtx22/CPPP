@@ -1,7 +1,0 @@
-make.exe --dry-run --keep-going --print-directory
-make: Entering directory 'f:/GITHUB/CPPP/src'
-g++ -Isfml/include -c main.cpp cppp.cpp
- 
-g++ main.o cppp.o -o main -Lsfml/lib -lsfml-graphics -lsfml-window -lsfml-system 
-make: Leaving directory 'f:/GITHUB/CPPP/src'
- 

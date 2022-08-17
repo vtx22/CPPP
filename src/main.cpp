@@ -1,11 +1,21 @@
 #include <SFML/Graphics.hpp>
 #include "cppp.hpp"
 
+#include <thread>
+#include <chrono>
+using namespace std::chrono_literals;
+
 int main()
 {
-   sf::RenderWindow window(sf::VideoMode(1280, 720), "CPPP - CPlusPlusPlotter");
+   sf::ContextSettings settings;
+   settings.antialiasingLevel = 16;
+   sf::RenderWindow window(sf::VideoMode(1600, 900), "CPPP - CPlusPlusPlotter", sf::Style::Default, settings);
 
    CPPP plotter(&window);
+
+   std::vector<float> data;
+   data.push_back(0);
+   int cnt = 1;
 
    while (window.isOpen())
    {
@@ -16,11 +26,16 @@ int main()
             window.close();
       }
 
+      data.push_back(rand() % 10 + 1);
       window.clear();
-
-      plotter.drawAxis(0, 0, 0);
+      plotter.addPlot(50);
+      plotter.setPlotMode(BOX_PLOT);
+      plotter.addData(data, LINE, sf::Color::Red);
+      plotter.showPlot();
 
       window.display();
+      cnt++;
+      std::this_thread::sleep_for(100ms);
    }
 
    return 0;
