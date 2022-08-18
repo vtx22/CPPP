@@ -34,6 +34,8 @@ void CPPP::drawAxis(bool dir, uint16_t startX, uint16_t startY, uint8_t width, u
       arrowTip.setRotation(dir ? 0 : 90);
       _window->draw(arrowTip);
    }
+
+   drawTicks(dir, startX, startY, length, dir ? _numOfTicksY : _numOfTicksX);
 }
 
 void CPPP::addPlot(uint8_t border)
@@ -56,6 +58,7 @@ void CPPP::showPlot()
 {
    drawAxis(false, _cpX, _cpY, _axisWeight, _cpWidth);
    drawAxis(true, _cpX, _cpY, _axisWeight, _cpHeight);
+
    if (_plotMode == PLOT_MODE::BOX_PLOT)
    {
       drawAxis(false, _cpX, _cpY - _cpHeight, _axisWeight, _cpWidth);
@@ -77,6 +80,34 @@ void CPPP::setPlotMode(PLOT_MODE mode)
 
 void CPPP::drawTicks(bool dir, uint16_t startX, uint16_t startY, uint16_t length, uint8_t numOfTicks)
 {
+
+   for (uint8_t i = 0; i < numOfTicks; i++)
+   {
+
+      uint8_t tickLength = 10;
+      if (_tickMode != TICK_MODE::CENTER)
+      {
+         tickLength /= 2;
+      }
+      sf::RectangleShape rect(sf::Vector2f(_axisWeight, tickLength));
+
+      uint8_t originX = _axisWeight / 2;
+      uint8_t originY = (_tickMode == TICK_MODE::CENTER) ? tickLength / 2 : 0;
+      rect.setOrigin(sf::Vector2f(originX, originY));
+      rect.setRotation(dir ? 90 : 0);
+
+      rect.setFillColor(sf::Color::White);
+      if (dir)
+      {
+         rect.setPosition(sf::Vector2f(startX, startY - i * length / (float)(numOfTicks - 1)));
+      }
+      else
+      {
+         rect.setPosition(sf::Vector2f(startX + i * length / (float)(numOfTicks - 1), startY));
+      }
+
+      _window->draw(rect);
+   }
 }
 
 void CPPP::centerCross()
@@ -88,7 +119,7 @@ void CPPP::centerCross()
    drawLine(sf::Vector2f(width / 2, 0), sf::Vector2f(width / 2, height));
 }
 
-void CPPP::addData(std::vector<float> data, LINE_TYPE type, sf::Color color)
+void CPPP::newDataset(std::vector<float> data, LINE_TYPE type, sf::Color color)
 {
    std::vector<float> dataX;
 
@@ -96,7 +127,11 @@ void CPPP::addData(std::vector<float> data, LINE_TYPE type, sf::Color color)
    {
       dataX.push_back(i);
    }
-
+   // HOTFIX
+   if (dataArray.size() > 0)
+   {
+      dataArray.erase(dataArray.begin());
+   }
    dataArray.push_back({dataX, data, type, color});
 }
 
@@ -195,6 +230,22 @@ void CPPP::plotGrid()
    if (_gridMode == GRID_MODE::NONE)
    {
       return;
+   }
+
+   if (_gridMode == GRID_MODE::SOLID)
+   {
+      float stepX = _cpWidth / (float)(_numOfTicksX - 1);
+      float stepY = _cpHeight / (float)(_numOfTicksY - 1);
+      sf::Color gridColor = sf::Color::White;
+      gridColor.a = 30;
+      for (uint8_t i = 1; i < _numOfTicksX - 1; i++)
+      {
+         drawLine(sf::Vector2f(_cpX + i * stepX, _cpY), sf::Vector2f(_cpX + i * stepX, _cpY - _cpHeight), gridColor);
+      }
+      for (uint8_t i = 1; i < _numOfTicksY - 1; i++)
+      {
+         drawLine(sf::Vector2f(_cpX, _cpY - i * stepY), sf::Vector2f(_cpX + _cpWidth, _cpY - i * stepY), gridColor);
+      }
    }
 }
 

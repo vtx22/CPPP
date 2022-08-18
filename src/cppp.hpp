@@ -37,7 +37,7 @@ struct PLOT_DATA
    std::vector<float> dataX, dataY;
    LINE_TYPE lineType = LINE_TYPE::SCATTER;
    sf::Color color = sf::Color::Red;
-   uint8_t lineWidth = 2, dotSize = 5;
+   uint8_t lineWidth = 2, dotSize = 2;
 
 } typedef PLOT_DATA;
 
@@ -58,7 +58,7 @@ public:
    void setAxisLimits(float minX, float maxX, float minY, float maxY);
 
    // DATA
-   void addData(std::vector<float> data, LINE_TYPE type, sf::Color color);
+   void newDataset(std::vector<float> data, LINE_TYPE type, sf::Color color);
 
    // HELPER
    void centerCross();
@@ -74,9 +74,10 @@ private:
 
    sf::RenderWindow *_window;
    uint16_t _cpX = 0, _cpY = 0, _cpWidth = 100, _cpHeight = 100;
-   uint8_t _axisWeight = 2, _numOfTicks = 5;
+   uint8_t _axisWeight = 2, _numOfTicksX = 5, _numOfTicksY = 3;
    PLOT_MODE _plotMode = PLOT_MODE::XY_ONLY;
-   GRID_MODE _gridMode = GRID_MODE::NONE;
+   GRID_MODE _gridMode = GRID_MODE::SOLID;
+   TICK_MODE _tickMode = TICK_MODE::CENTER;
 
    float _minX = 0, _minY = 0, _maxX, _maxY;
 
