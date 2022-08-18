@@ -2,6 +2,6 @@
 Plotter Library for C++ using SFML
 
 
-#Usage
-##Prerequisites
+# Usage
+## Prerequisites
 Using the library requires CMake and GCC MinGW
