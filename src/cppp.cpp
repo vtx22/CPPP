@@ -251,8 +251,8 @@ void CPPP::plotGrid()
 
 sf::Vector2f CPPP::functionValue2pixelValue(float x, float y)
 {
-   uint16_t px = _cpX + _cpWidth * x / (_maxX - _minX);
-   uint16_t py = _cpY - _cpHeight * y / (_maxY - _minY);
+   uint16_t px = _cpX + _cpWidth * (x - _minX) / (_maxX - _minX);
+   uint16_t py = _cpY - _cpHeight * (y - _minY) / (_maxY - _minY);
 
    return sf::Vector2f(px, py);
 }

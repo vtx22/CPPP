@@ -35,7 +35,7 @@ int main()
          data.erase(data.begin());
       }
 
-      data.push_back(abs(sin(stepSize * cnt)));
+      data.push_back(sin(stepSize * cnt));
       window.clear();
       plotter.addPlot(50);
       plotter.setPlotMode(BOX_PLOT);

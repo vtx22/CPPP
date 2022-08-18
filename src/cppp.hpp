@@ -77,7 +77,7 @@ private:
    uint8_t _axisWeight = 2, _numOfTicksX = 5, _numOfTicksY = 3;
    PLOT_MODE _plotMode = PLOT_MODE::XY_ONLY;
    GRID_MODE _gridMode = GRID_MODE::SOLID;
-   TICK_MODE _tickMode = TICK_MODE::CENTER;
+   TICK_MODE _tickMode = TICK_MODE::INNER;
 
    float _minX = 0, _minY = 0, _maxX, _maxY;
 
