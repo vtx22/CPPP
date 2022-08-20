@@ -4,17 +4,26 @@
 
 CPPP::CPPP(sf::RenderWindow *window) : _window(window)
 {
+   if (!_labelFont.loadFromFile("./sfml/fonts/cmunrm.ttf"))
+   {
+      printf("Error: Could not load font!\n");
+   }
 }
 
 CPPP::~CPPP()
 {
+}
+
+void CPPP::drawAxis(bool dir, uint16_t startX, uint16_t startY, uint8_t width, uint16_t length)
+{
+   drawAxis(dir, startX, startY, width, length, false);
 }
 /*!
 Draws an axis
 @param dir Direction of the axis (false = x, true = y)
 
 */
-void CPPP::drawAxis(bool dir, uint16_t startX, uint16_t startY, uint8_t width, uint16_t length)
+void CPPP::drawAxis(bool dir, uint16_t startX, uint16_t startY, uint8_t width, uint16_t length, bool boxAxis)
 {
    sf::RectangleShape axis;
    axis.setOrigin(0, _axisWeight / 2);
@@ -35,7 +44,7 @@ void CPPP::drawAxis(bool dir, uint16_t startX, uint16_t startY, uint8_t width, u
       _window->draw(arrowTip);
    }
 
-   drawTicks(dir, startX, startY, length, dir ? _numOfTicksY : _numOfTicksX);
+   drawTicks(dir, startX, startY, length, dir ? _numOfTicksY : _numOfTicksX, boxAxis);
 }
 
 void CPPP::addPlot(uint8_t border)
@@ -61,12 +70,13 @@ void CPPP::showPlot()
 
    if (_plotMode == PLOT_MODE::BOX_PLOT)
    {
-      drawAxis(false, _cpX, _cpY - _cpHeight, _axisWeight, _cpWidth);
-      drawAxis(true, _cpX + _cpWidth, _cpY, _axisWeight, _cpHeight);
+      drawAxis(false, _cpX, _cpY - _cpHeight, _axisWeight, _cpWidth, true);
+      drawAxis(true, _cpX + _cpWidth, _cpY, _axisWeight, _cpHeight, true);
    }
 
    plotGrid();
    plotData();
+   drawTitle();
 }
 
 void CPPP::setAxisWeight(uint8_t weight)
@@ -76,15 +86,21 @@ void CPPP::setAxisWeight(uint8_t weight)
 void CPPP::setPlotMode(PLOT_MODE mode)
 {
    _plotMode = mode;
+   _tickMode = TICK_MODE::INNER;
 }
 
 void CPPP::drawTicks(bool dir, uint16_t startX, uint16_t startY, uint16_t length, uint8_t numOfTicks)
+{
+   drawTicks(dir, startX, startY, length, numOfTicks, false);
+}
+
+void CPPP::drawTicks(bool dir, uint16_t startX, uint16_t startY, uint16_t length, uint8_t numOfTicks, bool boxAxis)
 {
 
    for (uint8_t i = 0; i < numOfTicks; i++)
    {
 
-      uint8_t tickLength = 10;
+      uint8_t tickLength = 20;
       if (_tickMode != TICK_MODE::CENTER)
       {
          tickLength /= 2;
@@ -95,6 +111,14 @@ void CPPP::drawTicks(bool dir, uint16_t startX, uint16_t startY, uint16_t length
       uint8_t originY = (_tickMode == TICK_MODE::CENTER) ? tickLength / 2 : 0;
       rect.setOrigin(sf::Vector2f(originX, originY));
       rect.setRotation(dir ? 90 : 0);
+      if (boxAxis)
+      {
+         rect.rotate(180);
+      }
+      if (_tickMode == TICK_MODE::INNER)
+      {
+         rect.rotate(180);
+      }
 
       rect.setFillColor(sf::Color::White);
       if (dir)
@@ -107,6 +131,35 @@ void CPPP::drawTicks(bool dir, uint16_t startX, uint16_t startY, uint16_t length
       }
 
       _window->draw(rect);
+
+      // Draw Labels
+      if (boxAxis)
+      {
+         continue;
+      }
+
+      sf::Text label;
+      label.setFont(_labelFont);
+      label.setFillColor(sf::Color::White);
+      label.setCharacterSize(15);
+      float value = 0;
+
+      if (dir)
+      {
+         value = _minY + i * (_maxY - _minY) / (numOfTicks - 1);
+         label.setString(floatToString(value, 2));
+         label.setOrigin(sf::Vector2f(label.getGlobalBounds().width, label.getGlobalBounds().height / 2));
+         label.setPosition(sf::Vector2f(_cpX - 8, _cpY - i * length / (float)(numOfTicks - 1)));
+      }
+      else
+      {
+         value = _minX + i * (_maxX - _minX) / (numOfTicks - 1);
+         label.setString(floatToString(value, 2));
+         label.setOrigin(sf::Vector2f(label.getGlobalBounds().width / 2, 0));
+         label.setPosition(sf::Vector2f(_cpX + i * length / (float)(numOfTicks - 1), _cpY + 8));
+      }
+
+      _window->draw(label);
    }
 }
 
@@ -132,15 +185,13 @@ void CPPP::newDataset(std::vector<float> data, LINE_TYPE type, sf::Color color)
    {
       dataArray.erase(dataArray.begin());
    }
-   dataArray.push_back({dataX, data, type, color});
+   dataArray.push_back({dataX, data, type, color, 2, 0});
 }
 
 void CPPP::plotData()
 {
-   if (_autoScale)
-   {
-      calculateAutoscaleLimits();
-   }
+
+   calculateAutoscaleLimits();
 
    for (auto const &array : dataArray)
    {
@@ -160,15 +211,25 @@ void CPPP::plotData()
       case LINE_TYPE::LINE:
          for (int i = 0; i < array.dataX.size(); i++)
          {
+            float valueX = array.dataX.at(i);
+            float valueY = array.dataY.at(i);
+            if (valueX < _minX || valueX > _maxX || valueY < _minY || valueY > _maxY)
+            {
+               continue;
+            }
             sf::CircleShape point(array.dotSize, 10);
             point.setOrigin(sf::Vector2f(array.dotSize, array.dotSize));
             point.setFillColor(array.color);
-            point.setPosition(functionValue2pixelValue(array.dataX.at(i), array.dataY.at(i)));
+            point.setPosition(functionValue2pixelValue(valueX, valueY));
             _window->draw(point);
-
             if (i > 0)
             {
-               drawLine(functionValue2pixelValue(array.dataX.at(i), array.dataY.at(i)), functionValue2pixelValue(array.dataX.at(i - 1), array.dataY.at(i - 1)), array.color);
+               float prevValueX = array.dataX.at(i - 1);
+               float prevValueY = array.dataY.at(i - 1);
+               if (!isOutOfBounds(true, prevValueX) && !isOutOfBounds(false, prevValueY))
+               {
+                  drawLine(functionValue2pixelValue(valueX, valueY), functionValue2pixelValue(prevValueX, prevValueY), array.color);
+               }
             }
          }
          break;
@@ -178,46 +239,73 @@ void CPPP::plotData()
 
 void CPPP::setAxisLimits(float minX, float maxX, float minY, float maxY)
 {
+   setAxisLimitsX(minX, maxX);
+   setAxisLimitsY(minY, maxY);
+}
+
+void CPPP::setAxisLimitsX(float minX, float maxX)
+{
    _minX = minX;
    _maxX = maxX;
+   _autoScaleX = false;
+}
+void CPPP::setAxisLimitsY(float minY, float maxY)
+{
    _minY = minY;
    _maxY = maxY;
-   _autoScale = false;
+   _autoScaleY = false;
 }
 
 void CPPP::calculateAutoscaleLimits()
 {
+   if (!_autoScaleX && !_autoScaleY)
+   {
+      return;
+   }
+
    float minX = 0, minY = 0, maxX = 0, maxY = 0;
    for (auto const &datStruct : dataArray)
    {
-      for (auto const &dat : datStruct.dataX)
+      if (_autoScaleX)
       {
-         if (dat < minX)
+         for (auto const &dat : datStruct.dataX)
          {
-            minX = dat;
-         }
-         if (dat > maxX)
-         {
-            maxX = dat;
+            if (dat < minX)
+            {
+               minX = dat;
+            }
+            if (dat > maxX)
+            {
+               maxX = dat;
+            }
          }
       }
-      for (auto const &dat : datStruct.dataY)
+      if (_autoScaleY)
       {
-         if (dat < minY)
+         for (auto const &dat : datStruct.dataY)
          {
-            minY = dat;
-         }
-         if (dat > maxY)
-         {
-            maxY = dat;
+            if (dat < minY)
+            {
+               minY = dat;
+            }
+            if (dat > maxY)
+            {
+               maxY = dat;
+            }
          }
       }
    }
 
-   _minX = minX;
-   _minY = minY;
-   _maxX = maxX;
-   _maxY = maxY;
+   if (_autoScaleX)
+   {
+      _minX = minX;
+      _maxX = maxX;
+   }
+   if (_autoScaleY)
+   {
+      _minY = minY;
+      _maxY = maxY;
+   }
 }
 
 void CPPP::setGridMode(GRID_MODE mode)
@@ -251,8 +339,8 @@ void CPPP::plotGrid()
 
 sf::Vector2f CPPP::functionValue2pixelValue(float x, float y)
 {
-   uint16_t px = _cpX + _cpWidth * (x - _minX) / (_maxX - _minX);
-   uint16_t py = _cpY - _cpHeight * (y - _minY) / (_maxY - _minY);
+   uint16_t px = round(map(x, _minX, _maxX, _cpX, _cpX + _cpWidth));
+   uint16_t py = round(map(y, _minY, _maxY, _cpY, _cpY - _cpHeight));
 
    return sf::Vector2f(px, py);
 }
@@ -274,4 +362,52 @@ void CPPP::drawLine(sf::Vector2f p1, sf::Vector2f p2, sf::Color color)
 void CPPP::drawLine(sf::Vector2f p1, sf::Vector2f p2)
 {
    drawLine(p1, p2, sf::Color::White);
+}
+
+float CPPP::map(float value, float minVal, float maxVal, float newMin, float newMax)
+{
+   if (value > maxVal)
+   {
+      return maxVal;
+   }
+   if (value < minVal)
+   {
+      return minVal;
+   }
+   return (value - minVal) * (newMax - newMin) / (maxVal - minVal) + newMin;
+}
+
+bool CPPP::isOutOfBounds(bool x, float value)
+{
+   if (x)
+   {
+      return (value < _minX || value > _maxX);
+   }
+   return (value < _minY || value > _maxY);
+}
+
+std::string CPPP::floatToString(float value, uint8_t precision)
+{
+   std::stringstream stream;
+   stream << std::fixed << std::setprecision(precision) << value;
+   return stream.str();
+}
+
+void CPPP::setTitle(std::string title)
+{
+   _plotTitle = title;
+}
+
+void CPPP::drawTitle()
+{
+   sf::Text title;
+   title.setFont(_labelFont);
+   title.setFillColor(sf::Color::White);
+   title.setCharacterSize(20);
+   title.setString(_plotTitle);
+
+   title.setOrigin(sf::Vector2f(title.getGlobalBounds().width / 2, title.getGlobalBounds().height));
+   title.setPosition(sf::Vector2f(_cpX + _cpWidth / 2, _cpY - _cpHeight - 20));
+
+   _window->draw(title);
 }

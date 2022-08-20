@@ -1,11 +1,19 @@
-#include <SFML/Graphics.hpp>
+#ifndef CPPP_HPP
+#define CPPP_HPP
+#pragma once
 
+#include <SFML/Graphics.hpp>
 #include <cstdint>
 #include <vector>
+#include <math.h>
+#include <cstring>
+#include <iomanip>
+#include <sstream>
 
 enum PLOT_MODE
 {
    XY_ONLY = 0,
+   XY_ONLYCZERO,
    BOX_PLOT
 
 } typedef PLOT_MODE;
@@ -50,12 +58,15 @@ public:
    // COORD SYSTEM
    void addPlot(uint16_t x, uint16_t y, uint16_t width, uint16_t height);
    void addPlot(uint8_t border);
-   void drawAxis(bool dir, uint16_t startX, uint16_t startY, uint8_t width, uint16_t length);
+
    void showPlot();
    void setAxisWeight(uint8_t weight);
    void setPlotMode(PLOT_MODE mode);
    void setGridMode(GRID_MODE mode);
    void setAxisLimits(float minX, float maxX, float minY, float maxY);
+   void setAxisLimitsX(float minX, float maxX);
+   void setAxisLimitsY(float minY, float maxY);
+   void setTitle(std::string title);
 
    // DATA
    void newDataset(std::vector<float> data, LINE_TYPE type, sf::Color color);
@@ -64,24 +75,35 @@ public:
    void centerCross();
 
 private:
+   void drawAxis(bool dir, uint16_t startX, uint16_t startY, uint8_t width, uint16_t length);
+   void drawAxis(bool dir, uint16_t startX, uint16_t startY, uint8_t width, uint16_t length, bool boxAxis);
    void drawTicks(bool dir, uint16_t startX, uint16_t startY, uint16_t length, uint8_t numOfTicks);
+   void drawTicks(bool dir, uint16_t startX, uint16_t startY, uint16_t length, uint8_t numOfTicks, bool boxAxis);
    void plotData();
    void plotGrid();
    void calculateAutoscaleLimits();
    void drawLine(sf::Vector2f p1, sf::Vector2f p2, sf::Color color);
    void drawLine(sf::Vector2f p1, sf::Vector2f p2);
+   float map(float value, float minVal, float maxVal, float newMin, float newMax);
+   bool isOutOfBounds(bool x, float value);
+   std::string floatToString(float value, uint8_t precision);
    sf::Vector2f functionValue2pixelValue(float x, float y);
+   void drawTitle();
 
    sf::RenderWindow *_window;
    uint16_t _cpX = 0, _cpY = 0, _cpWidth = 100, _cpHeight = 100;
    uint8_t _axisWeight = 2, _numOfTicksX = 5, _numOfTicksY = 3;
    PLOT_MODE _plotMode = PLOT_MODE::XY_ONLY;
    GRID_MODE _gridMode = GRID_MODE::SOLID;
-   TICK_MODE _tickMode = TICK_MODE::INNER;
+   TICK_MODE _tickMode = TICK_MODE::OUTER;
 
-   float _minX = 0, _minY = 0, _maxX, _maxY;
+   float _minX = 0, _minY = 0, _maxX = 1, _maxY = 1;
 
-   bool _autoScale = true;
+   bool _autoScaleX = true, _autoScaleY = true;
 
    std::vector<PLOT_DATA> dataArray;
+   sf::Font _labelFont;
+   std::string _plotTitle = "";
 };
+
+#endif // CPPP_HPP
