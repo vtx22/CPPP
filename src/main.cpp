@@ -18,6 +18,7 @@ int main()
    CPPP plotter(&window);
 
    std::vector<float> data;
+   std::vector<float> dataX;
 
    int cnt = 0;
    /*
@@ -40,19 +41,22 @@ int main()
       }
 
       float stepSize = 2 * M_PI / 750;
+      /*
       if (cnt > 4 * M_PI / stepSize)
       {
          data.erase(data.begin());
       }
+      */
 
-      data.push_back(sin(stepSize * cnt) * (cnt));
+      data.push_back(sin(stepSize * cnt) * cnt);
+      dataX.push_back(cnt);
 
       window.clear();
 
       plotter.addPlot(80);
       plotter.setTitle("Sine Wave");
       plotter.setPlotMode(BOX_PLOT);
-      plotter.newDataset(data, LINE, sf::Color::Red);
+      plotter.newDataset(dataX, data, LINE, sf::Color::Red);
       plotter.showPlot();
 
       window.display();
