@@ -77,6 +77,9 @@ void CPPP::showPlot()
    plotGrid();
    plotData();
    drawTitle();
+
+   // Fix
+   dataArray.clear();
 }
 
 void CPPP::setAxisWeight(uint8_t weight)
@@ -187,10 +190,6 @@ void CPPP::newDataset(std::vector<float> dataY, LINE_TYPE type, sf::Color color)
 void CPPP::newDataset(std::vector<float> dataX, std::vector<float> dataY, LINE_TYPE type, sf::Color color)
 {
    // HOTFIX
-   if (dataArray.size() > 0)
-   {
-      dataArray.erase(dataArray.begin());
-   }
    dataArray.push_back({dataX, dataY, type, color, 2, 0});
 }
 
