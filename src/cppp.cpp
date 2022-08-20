@@ -148,7 +148,7 @@ void CPPP::drawTicks(bool dir, uint16_t startX, uint16_t startY, uint16_t length
       {
          value = _minY + i * (_maxY - _minY) / (numOfTicks - 1);
          label.setString(floatToString(value, 2));
-         label.setOrigin(sf::Vector2f(label.getGlobalBounds().width, label.getGlobalBounds().height / 2));
+         label.setOrigin(sf::Vector2f(label.getGlobalBounds().width, label.getGlobalBounds().height));
          label.setPosition(sf::Vector2f(_cpX - 8, _cpY - i * length / (float)(numOfTicks - 1)));
       }
       else
@@ -172,20 +172,26 @@ void CPPP::centerCross()
    drawLine(sf::Vector2f(width / 2, 0), sf::Vector2f(width / 2, height));
 }
 
-void CPPP::newDataset(std::vector<float> data, LINE_TYPE type, sf::Color color)
+void CPPP::newDataset(std::vector<float> dataY, LINE_TYPE type, sf::Color color)
 {
    std::vector<float> dataX;
 
-   for (int i = 0; i < data.size(); i++)
+   for (int i = 0; i < dataY.size(); i++)
    {
       dataX.push_back(i);
    }
+
+   newDataset(dataX, dataY, type, color);
+}
+
+void CPPP::newDataset(std::vector<float> dataX, std::vector<float> dataY, LINE_TYPE type, sf::Color color)
+{
    // HOTFIX
    if (dataArray.size() > 0)
    {
       dataArray.erase(dataArray.begin());
    }
-   dataArray.push_back({dataX, data, type, color, 2, 0});
+   dataArray.push_back({dataX, dataY, type, color, 2, 0});
 }
 
 void CPPP::plotData()

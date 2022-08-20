@@ -70,6 +70,7 @@ public:
 
    // DATA
    void newDataset(std::vector<float> data, LINE_TYPE type, sf::Color color);
+   void newDataset(std::vector<float> dataX, std::vector<float> dataY, LINE_TYPE type, sf::Color color);
 
    // HELPER
    void centerCross();
