@@ -20,14 +20,14 @@ int main()
    std::vector<float> data;
 
    int cnt = 0;
-
+   /*
    float stepSize = 2 * M_PI / 8000;
 
    for (int i = 0; i < 4 * M_PI / stepSize; i++)
    {
       data.push_back(sin(i * stepSize));
    }
-
+   */
    while (window.isOpen())
    {
       sf::Event event;
@@ -38,20 +38,20 @@ int main()
             window.close();
          }
       }
-      /*
-      float stepSize = 2 * M_PI / 1500;
-      if (cnt > 2 * M_PI / stepSize)
+
+      float stepSize = 2 * M_PI / 750;
+      if (cnt > 4 * M_PI / stepSize)
       {
          data.erase(data.begin());
       }
 
-      data.push_back(sin(stepSize * cnt));
-      */
+      data.push_back(sin(stepSize * cnt) * (cnt));
+
       window.clear();
+
       plotter.addPlot(80);
       plotter.setTitle("Sine Wave");
       plotter.setPlotMode(BOX_PLOT);
-      plotter.setAxisLimitsY(-0.5, 0.5);
       plotter.newDataset(data, LINE, sf::Color::Red);
       plotter.showPlot();
 
