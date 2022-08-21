@@ -38,10 +38,10 @@ Draws an axis
 void CPPP::drawAxis(bool dir, uint16_t startX, uint16_t startY, uint8_t width, uint16_t length, bool boxAxis)
 {
    sf::RectangleShape axis;
-   axis.setOrigin(0, _axisWeight / 2);
    axis.setPosition(sf::Vector2f(startX, startY));
    axis.setFillColor(sf::Color::White);
    axis.setSize(sf::Vector2f(length, width));
+   axis.setOrigin(0, _axisWeight / 2);
    axis.setRotation(dir ? -90 : 0);
    _window->draw(axis);
 
@@ -51,9 +51,17 @@ void CPPP::drawAxis(bool dir, uint16_t startX, uint16_t startY, uint8_t width, u
       sf::CircleShape arrowTip(trigRadius, 3);
       arrowTip.setOrigin(trigRadius, trigRadius + trigRadius / 2);
       arrowTip.setFillColor(sf::Color::White);
-      arrowTip.setPosition(sf::Vector2f(dir ? startX : (startX + length), dir ? (startY - length) : startY));
+      arrowTip.setPosition(sf::Vector2f(dir ? startX : (startX + length + 15), dir ? (startY - length - 15) : startY));
       arrowTip.setRotation(dir ? 0 : 90);
       _window->draw(arrowTip);
+
+      sf::RectangleShape axisExtend;
+      axisExtend.setFillColor(sf::Color::White);
+      axisExtend.setSize(sf::Vector2f(15, _axisWeight));
+      axisExtend.setRotation(dir ? -90 : 0);
+      axisExtend.setOrigin(0, _axisWeight / 2);
+      axisExtend.setPosition(sf::Vector2f(dir ? startX : (startX + length), dir ? (startY - length) : startY));
+      _window->draw(axisExtend);
    }
 
    drawTicks(dir, startX, startY, length, dir ? _numOfTicksY : _numOfTicksX, boxAxis);
