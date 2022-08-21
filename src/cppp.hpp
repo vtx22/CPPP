@@ -9,6 +9,9 @@
 #include <cstring>
 #include <iomanip>
 #include <sstream>
+#include <thread>
+#include <chrono>
+using namespace std::chrono_literals;
 
 enum PLOT_MODE
 {
@@ -68,6 +71,7 @@ public:
    void setAxisLimitsY(float minY, float maxY);
    void setTitle(std::string title);
    void setFPS(float fps);
+
    void setMaxSamples(int samples);
 
    // DATA
@@ -88,6 +92,7 @@ private:
    void drawLine(sf::Vector2f p1, sf::Vector2f p2, sf::Color color);
    void drawLine(sf::Vector2f p1, sf::Vector2f p2);
 
+   void setFPS(float fps, bool autoFPS);
    void drawFPS();
 
    float map(float value, float minVal, float maxVal, float newMin, float newMax);
@@ -111,7 +116,8 @@ private:
    sf::Font _labelFont;
    std::string _plotTitle = "";
    std::string _fps = "";
-   int _resolution = 1000;
+   int _resolution = 700;
+   bool _autoFPS = true;
 };
 
 #endif // CPPP_HPP

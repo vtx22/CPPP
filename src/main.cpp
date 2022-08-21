@@ -5,10 +5,6 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-#include <thread>
-#include <chrono>
-using namespace std::chrono_literals;
-
 int main()
 {
    sf::ContextSettings settings;
@@ -33,7 +29,6 @@ int main()
    */
    while (window.isOpen())
    {
-      auto start = std::chrono::steady_clock::now();
       sf::Event event;
       while (window.pollEvent(event))
       {
@@ -64,14 +59,11 @@ int main()
       plotter.newDataset(dataX, data, LINE, sf::Color::Red);
       plotter.newDataset(dataX, data2, LINE, sf::Color::Blue);
       plotter.newDataset(dataX, data3, LINE, sf::Color::Green);
-      plotter.setFPS(fps);
       // plotter.setAxisLimitsX(cnt - 1000, cnt);
       plotter.showPlot();
 
       window.display();
       cnt++;
-      auto end = std::chrono::steady_clock::now();
-      fps = 1 / (std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() / 1000000.f);
    }
 
    return 0;

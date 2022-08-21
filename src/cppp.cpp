@@ -103,6 +103,15 @@ void CPPP::showPlot()
    plotGrid();
    plotData();
    drawTitle();
+
+   if (_autoFPS)
+   {
+      auto currentTime = std::chrono::steady_clock::now();
+      static auto lastTime = std::chrono::steady_clock::now();
+      float fps = 1 / (std::chrono::duration_cast<std::chrono::microseconds>(currentTime - lastTime).count() / 1000000.f);
+      lastTime = currentTime;
+      setFPS(fps, true);
+   }
    drawFPS();
 
    // Fix
@@ -513,6 +522,12 @@ Function to pass the FPS, calculated from your own code
 */
 void CPPP::setFPS(float fps)
 {
+   setFPS(fps, false);
+}
+
+void CPPP::setFPS(float fps, bool autoFPS)
+{
+   _autoFPS = autoFPS;
    _fps = floatToString(fps, 0);
 }
 
