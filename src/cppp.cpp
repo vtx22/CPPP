@@ -77,6 +77,7 @@ void CPPP::showPlot()
    plotGrid();
    plotData();
    drawTitle();
+   drawFPS();
 
    // Fix
    dataArray.clear();
@@ -198,8 +199,23 @@ void CPPP::plotData()
 
    calculateAutoscaleLimits();
 
-   for (auto const &array : dataArray)
+   for (auto array : dataArray)
    {
+      int valuesToDelete = array.dataX.size() - _resolution;
+
+      if (array.dataX.size() > _resolution)
+      {
+         std::vector<float> newDataX, newDataY;
+         float stepSize = array.dataX.size() / (float)_resolution;
+         std::cout << "Step size: " << stepSize << std::endl;
+         for (int i = 0; i < _resolution; i++)
+         {
+            newDataX.push_back(array.dataX.at((int)(i * stepSize)));
+            newDataY.push_back(array.dataY.at((int)(i * stepSize)));
+         }
+         array.dataX = newDataX;
+         array.dataY = newDataY;
+      }
       switch (array.lineType)
       {
       default:
@@ -415,4 +431,31 @@ void CPPP::drawTitle()
    title.setPosition(sf::Vector2f(_cpX + _cpWidth / 2, _cpY - _cpHeight - 20));
 
    _window->draw(title);
+}
+
+void CPPP::setFPS(float fps)
+{
+   _fps = floatToString(fps, 0);
+}
+void CPPP::drawFPS()
+{
+   sf::Text fps;
+   fps.setFont(_labelFont);
+   fps.setFillColor(sf::Color::White);
+   fps.setCharacterSize(20);
+   fps.setString("FPS: " + _fps);
+
+   fps.setOrigin(sf::Vector2f(fps.getGlobalBounds().width, fps.getGlobalBounds().height));
+   fps.setPosition(sf::Vector2f(_cpX + _cpWidth, _cpY - _cpHeight - 20));
+
+   _window->draw(fps);
+}
+
+void CPPP::setMaxSamples(int samples)
+{
+   if (samples <= 0)
+   {
+      _resolution = 100;
+   }
+   _resolution = samples;
 }

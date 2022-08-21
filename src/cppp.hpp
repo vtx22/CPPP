@@ -67,6 +67,8 @@ public:
    void setAxisLimitsX(float minX, float maxX);
    void setAxisLimitsY(float minY, float maxY);
    void setTitle(std::string title);
+   void setFPS(float fps);
+   void setMaxSamples(int samples);
 
    // DATA
    void newDataset(std::vector<float> dataY, LINE_TYPE type, sf::Color color);
@@ -85,6 +87,9 @@ private:
    void calculateAutoscaleLimits();
    void drawLine(sf::Vector2f p1, sf::Vector2f p2, sf::Color color);
    void drawLine(sf::Vector2f p1, sf::Vector2f p2);
+
+   void drawFPS();
+
    float map(float value, float minVal, float maxVal, float newMin, float newMax);
    bool isOutOfBounds(bool x, float value);
    std::string floatToString(float value, uint8_t precision);
@@ -105,6 +110,8 @@ private:
    std::vector<PLOT_DATA> dataArray;
    sf::Font _labelFont;
    std::string _plotTitle = "";
+   std::string _fps = "";
+   int _resolution = 1000;
 };
 
 #endif // CPPP_HPP
