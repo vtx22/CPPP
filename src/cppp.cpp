@@ -125,7 +125,8 @@ Sets the plot mode
 void CPPP::setPlotMode(PLOT_MODE mode)
 {
    _plotMode = mode;
-   _tickMode = TICK_MODE::INNER;
+
+   _tickMode = (mode == PLOT_MODE::BOX_PLOT) ? TICK_MODE::INNER : TICK_MODE::OUTER;
 }
 
 void CPPP::drawTicks(bool dir, uint16_t startX, uint16_t startY, uint16_t length, uint8_t numOfTicks)
@@ -188,14 +189,14 @@ void CPPP::drawTicks(bool dir, uint16_t startX, uint16_t startY, uint16_t length
          value = _minY + i * (_maxY - _minY) / (numOfTicks - 1);
          label.setString(floatToString(value, 2));
          label.setOrigin(sf::Vector2f(label.getGlobalBounds().width, label.getGlobalBounds().height));
-         label.setPosition(sf::Vector2f(_cpX - 8, _cpY - i * length / (float)(numOfTicks - 1)));
+         label.setPosition(sf::Vector2f(_cpX - 14, _cpY - i * length / (float)(numOfTicks - 1)));
       }
       else
       {
          value = _minX + i * (_maxX - _minX) / (numOfTicks - 1);
          label.setString(floatToString(value, 2));
          label.setOrigin(sf::Vector2f(label.getGlobalBounds().width / 2, 0));
-         label.setPosition(sf::Vector2f(_cpX + i * length / (float)(numOfTicks - 1), _cpY + 8));
+         label.setPosition(sf::Vector2f(_cpX + i * length / (float)(numOfTicks - 1), _cpY + 14));
       }
 
       _window->draw(label);
@@ -520,7 +521,7 @@ void CPPP::drawFPS()
    sf::Text fps;
    fps.setFont(_labelFont);
    fps.setFillColor(sf::Color::White);
-   fps.setCharacterSize(20);
+   fps.setCharacterSize(15);
    fps.setString("FPS: " + _fps);
 
    fps.setOrigin(sf::Vector2f(fps.getGlobalBounds().width, fps.getGlobalBounds().height));
