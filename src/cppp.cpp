@@ -207,7 +207,6 @@ void CPPP::plotData()
       {
          std::vector<float> newDataX, newDataY;
          float stepSize = array.dataX.size() / (float)_resolution;
-         std::cout << "Step size: " << stepSize << std::endl;
          for (int i = 0; i < _resolution; i++)
          {
             newDataX.push_back(array.dataX.at((int)(i * stepSize)));
@@ -414,6 +413,10 @@ std::string CPPP::floatToString(float value, uint8_t precision)
    return stream.str();
 }
 
+/*!
+Sets the plot title which will be shown above the plot
+@param title Plot title string
+*/
 void CPPP::setTitle(std::string title)
 {
    _plotTitle = title;
@@ -433,10 +436,15 @@ void CPPP::drawTitle()
    _window->draw(title);
 }
 
+/*!
+Function to pass the FPS, calculated from your own code
+@param fps Current Framerate
+*/
 void CPPP::setFPS(float fps)
 {
    _fps = floatToString(fps, 0);
 }
+
 void CPPP::drawFPS()
 {
    sf::Text fps;
@@ -451,6 +459,11 @@ void CPPP::drawFPS()
    _window->draw(fps);
 }
 
+/*!
+Sets the amount of samples / datapoints taken from the passed dataset for plotting.
+If the dataset contains less samples than the max samples all points will be plotted!
+@param samples Maximum samples for every datset
+*/
 void CPPP::setMaxSamples(int samples)
 {
    if (samples <= 0)
