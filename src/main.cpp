@@ -12,7 +12,7 @@ using namespace std::chrono_literals;
 int main()
 {
    sf::ContextSettings settings;
-   settings.antialiasingLevel = 16;
+   settings.antialiasingLevel = 4;
    sf::RenderWindow window(sf::VideoMode(1850, 990), "CPPP - CPlusPlusPlotter", sf::Style::Close, settings);
 
    CPPP plotter(&window);
@@ -51,19 +51,19 @@ int main()
       }
       */
 
-      data.push_back(sin(stepSize * cnt) * cnt);
-      data2.push_back(cnt);
-      data3.push_back(-cnt);
-      dataX.push_back(cnt);
+      data.push_back(sin(stepSize * cnt) * (stepSize * cnt));
+      data2.push_back(stepSize * cnt);
+      data3.push_back(-stepSize * cnt);
+      dataX.push_back(stepSize * cnt);
 
       window.clear();
 
       plotter.addPlot(80);
       plotter.setTitle("Sine Wave");
-      plotter.setPlotMode(BOX_PLOT);
-      plotter.newDataset(data, LINE, sf::Color::Red);
-      plotter.newDataset(data2, LINE, sf::Color::Blue);
-      plotter.newDataset(data3, LINE, sf::Color::Green);
+      plotter.setPlotMode(XY_ONLY);
+      plotter.newDataset(dataX, data, LINE, sf::Color::Red);
+      plotter.newDataset(dataX, data2, LINE, sf::Color::Blue);
+      plotter.newDataset(dataX, data3, LINE, sf::Color::Green);
       plotter.setFPS(fps);
       // plotter.setAxisLimitsX(cnt - 1000, cnt);
       plotter.showPlot();
