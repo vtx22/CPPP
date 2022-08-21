@@ -13,7 +13,7 @@
 enum PLOT_MODE
 {
    XY_ONLY = 0,
-   XY_ONLYCZERO,
+   XY_ONLY_CZERO,
    BOX_PLOT
 
 } typedef PLOT_MODE;

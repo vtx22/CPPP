@@ -14,6 +14,14 @@ CPPP::~CPPP()
 {
 }
 
+/*!
+Draws an axis (not usable for the two extra axis in boxed mode)
+@param dir Direction of the axis (false = x, true = y)
+@param startX x value of the axis coordinate (left side for x axis, bottom for y axis)
+@param startY y value of the axis coordinate (left side for x axis, bottom for y axis)
+@param width Line width of the axis in pixels
+@param length Length of the axis in pixels
+*/
 void CPPP::drawAxis(bool dir, uint16_t startX, uint16_t startY, uint8_t width, uint16_t length)
 {
    drawAxis(dir, startX, startY, width, length, false);
@@ -21,7 +29,11 @@ void CPPP::drawAxis(bool dir, uint16_t startX, uint16_t startY, uint8_t width, u
 /*!
 Draws an axis
 @param dir Direction of the axis (false = x, true = y)
-
+@param startX x value of the axis coordinate (left side for x axis, bottom for y axis)
+@param startY y value of the axis coordinate (left side for x axis, bottom for y axis)
+@param width Line width of the axis in pixels
+@param length Length of the axis in pixels
+@param boxAxis If true the axis will be recognized as one of the box axis (right / top) so that no labels will be plotted
 */
 void CPPP::drawAxis(bool dir, uint16_t startX, uint16_t startY, uint8_t width, uint16_t length, bool boxAxis)
 {
@@ -47,6 +59,10 @@ void CPPP::drawAxis(bool dir, uint16_t startX, uint16_t startY, uint8_t width, u
    drawTicks(dir, startX, startY, length, dir ? _numOfTicksY : _numOfTicksX, boxAxis);
 }
 
+/*!
+Adds a fullscreen plot with a specified border around the plot
+@param border Plot border to the window outlines in pixels
+*/
 void CPPP::addPlot(uint8_t border)
 {
    uint16_t width = _window->getSize().x;
@@ -55,6 +71,13 @@ void CPPP::addPlot(uint8_t border)
    addPlot(border, height - border, width - 2 * border, height - 2 * border);
 }
 
+/*!
+Adds a new plot to the window
+@param x x value of the plot coordinate (bottom left)
+@param y y value of the plot coordinate (bottom left)
+@param width Width of the plot
+@param height Height of the plot
+*/
 void CPPP::addPlot(uint16_t x, uint16_t y, uint16_t width, uint16_t height)
 {
    _cpX = x;
@@ -63,6 +86,9 @@ void CPPP::addPlot(uint16_t x, uint16_t y, uint16_t width, uint16_t height)
    _cpHeight = height;
 }
 
+/*!
+Show the complete plot
+*/
 void CPPP::showPlot()
 {
    drawAxis(false, _cpX, _cpY, _axisWeight, _cpWidth);
@@ -83,10 +109,19 @@ void CPPP::showPlot()
    dataArray.clear();
 }
 
+/*!
+Sets the axis weight in pixels
+@param weight Axis weight in pixels
+*/
 void CPPP::setAxisWeight(uint8_t weight)
 {
    _axisWeight = weight;
 }
+
+/*!
+Sets the plot mode
+@param mode Plot mode (e.g. XY_ONLY or BOX_PLOT)
+*/
 void CPPP::setPlotMode(PLOT_MODE mode)
 {
    _plotMode = mode;
@@ -176,6 +211,12 @@ void CPPP::centerCross()
    drawLine(sf::Vector2f(width / 2, 0), sf::Vector2f(width / 2, height));
 }
 
+/*!
+Create a new dataset with only Y-Values (X-Values are assumed to be from 0 - Y-Values-Length-1)
+@param dataY Vector that contains all Y-Values
+@param type Line type (e.g. SCATTER or LINE)
+@param color Color of the datset
+*/
 void CPPP::newDataset(std::vector<float> dataY, LINE_TYPE type, sf::Color color)
 {
    std::vector<float> dataX;
@@ -188,6 +229,13 @@ void CPPP::newDataset(std::vector<float> dataY, LINE_TYPE type, sf::Color color)
    newDataset(dataX, dataY, type, color);
 }
 
+/*!
+Create a new dataset with X-Values and their corresponding Y-Values
+@param dataX Vector that contains all X-Values
+@param dataY Vector that contains all Y-Values
+@param type Line type (e.g. SCATTER or LINE)
+@param color Color of the datset
+*/
 void CPPP::newDataset(std::vector<float> dataX, std::vector<float> dataY, LINE_TYPE type, sf::Color color)
 {
    // HOTFIX
@@ -257,18 +305,36 @@ void CPPP::plotData()
    }
 }
 
+/*!
+Sets all axis limits manualle
+@param minX X-Axis lower limit
+@param maxX X-Axis upper limit
+@param minY Y-Axis lower limit
+@param maxY Y-Axis upper limit
+*/
 void CPPP::setAxisLimits(float minX, float maxX, float minY, float maxY)
 {
    setAxisLimitsX(minX, maxX);
    setAxisLimitsY(minY, maxY);
 }
 
+/*!
+Sets the X-Axis limits manualle
+@param minX X-Axis lower limit
+@param maxX X-Axis upper limit
+*/
 void CPPP::setAxisLimitsX(float minX, float maxX)
 {
    _minX = minX;
    _maxX = maxX;
    _autoScaleX = false;
 }
+
+/*!
+Sets the Y-Axis limits manualle
+@param minY Y-Axis lower limit
+@param maxY Y-Axis upper limit
+*/
 void CPPP::setAxisLimitsY(float minY, float maxY)
 {
    _minY = minY;
@@ -328,6 +394,10 @@ void CPPP::calculateAutoscaleLimits()
    }
 }
 
+/*!
+Sets the Grid Mode
+@param mode Grid mode (e.g. NONE, SOLID, DASHED)
+*/
 void CPPP::setGridMode(GRID_MODE mode)
 {
    _gridMode = mode;
