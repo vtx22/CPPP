@@ -21,7 +21,7 @@ int main()
    std::vector<float> dataX;
 
    int cnt = 0;
-
+   float fps = 0;
    /*
    float stepSize = 2 * M_PI / 8000;
 
@@ -31,9 +31,9 @@ int main()
       data2.push_back(cos(i * stepSize));
    }
    */
-
    while (window.isOpen())
    {
+      auto start = std::chrono::steady_clock::now();
       sf::Event event;
       while (window.pollEvent(event))
       {
@@ -64,12 +64,14 @@ int main()
       plotter.newDataset(data, LINE, sf::Color::Red);
       plotter.newDataset(data2, LINE, sf::Color::Blue);
       plotter.newDataset(data3, LINE, sf::Color::Green);
+      plotter.setFPS(fps);
       // plotter.setAxisLimitsX(cnt - 1000, cnt);
       plotter.showPlot();
 
       window.display();
       cnt++;
-      // std::this_thread::sleep_for(1ms);
+      auto end = std::chrono::steady_clock::now();
+      fps = 1 / (std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() / 1000000.f);
    }
 
    return 0;
