@@ -400,11 +400,21 @@ void CPPP::calculateAutoscaleLimits()
 
    if (_autoScaleX)
    {
+      if (minX == maxX)
+      {
+         minX = minX - 0.1 * abs(minX);
+         maxX = maxX + 0.1 * abs(maxX);
+      }
       _minX = minX;
       _maxX = maxX;
    }
    if (_autoScaleY)
    {
+      if (minY == maxY)
+      {
+         minY = minY - 0.1 * abs(minY);
+         maxY = maxY + 0.1 * abs(maxY);
+      }
       _minY = minY;
       _maxY = maxY;
    }
