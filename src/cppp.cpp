@@ -1,7 +1,5 @@
 #include "cppp.hpp"
 
-#include <iostream>
-
 CPPP::CPPP(sf::RenderWindow *window) : _window(window)
 {
    if (!_labelFont.loadFromFile("./sfml/fonts/cmunrm.ttf"))

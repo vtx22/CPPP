@@ -11,6 +11,7 @@
 #include <sstream>
 #include <thread>
 #include <chrono>
+#include <iostream>
 using namespace std::chrono_literals;
 
 enum PLOT_MODE
